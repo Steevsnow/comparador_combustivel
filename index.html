@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Combustível Pro v6.0</title>
+    <title>Combustível Pro v7.0 (Logos Originais)</title>
     <style>
         :root {
             --primary: #27ae60; --secondary: #2980b9; --bg: #121212;
             --card: #1e1e1e; --text: #ffffff; --danger: #e74c3c;
-            --waze: #33ccff; --ipiranga: #ffcc00; --shell: #fbce07; --petrobras: #008542;
         }
 
         body {
@@ -33,7 +32,7 @@
             border-radius: 12px; font-size: 1.5rem; color: #fff; text-align: center; box-sizing: border-box; outline: none;
         }
 
-        select { font-size: 0.9rem; appearance: none; cursor: pointer; }
+        select { font-size: 0.9rem; appearance: none; cursor: pointer; color: #aaa;}
 
         /* Botões Principais */
         .button-group { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-top: 10px; }
@@ -41,18 +40,37 @@
         .btn-calc { background: white; color: black; } .btn-clear { background: #333; color: var(--danger); }
         button:active { transform: scale(0.95); }
 
-        /* Botões de Bandeiras e GPS */
-        .brand-section { margin-top: 20px; text-align: left; }
-        .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+        /* Estilo Botões de GPS e Bandeiras com Logos */
+        .brand-section { margin-top: 25px; text-align: left; }
+        .grid-brands { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .grid-gps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         
-        .btn-brand { font-size: 0.8rem; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; border-bottom: 3px solid rgba(0,0,0,0.2); }
-        
-        /* Cores Marcas */
-        .ipiranga { background: var(--ipiranga); color: #003399; }
-        .shell { background: var(--shell); color: #d20000; }
-        .petrobras { background: var(--petrobras); color: white; }
-        .gps-google { background: #fff; color: #5f6368; border: 1px solid #ddd; }
-        .gps-waze { background: var(--waze); color: #000; }
+        .btn-brand-logo { 
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px; /* Altura fixa para alinhar */
+            transition: all 0.2s;
+        }
+
+        .btn-brand-logo img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        /* Hover leve nos logos */
+        .btn-brand-logo:hover {
+            box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Cores específicas de fundo para GPS (opcional, para dar contraste) */
+        .btn-waze { background: #33ccff; border: none; } /* Azul Waze */
 
         /* Resultado */
         #resultado { margin-top: 1.2rem; padding: 15px; border-radius: 15px; display: none; animation: slideUp 0.3s ease; }
@@ -84,7 +102,7 @@
     </div>
 
     <div class="input-container">
-        <label style="color:#888">ANO DO VEÍCULO (RELEMBRADO)</label>
+        <label style="color:#888">ANO DO VEÍCULO (MEMÓRIA)</label>
         <select id="regra" onchange="salvarConfig()">
             <option value="0.70">Até 2012 (Regra 70%)</option>
             <option value="0.72">2013-2020 (Regra 72%)</option>
@@ -97,20 +115,39 @@
         <button class="btn-clear" onclick="limpar()">LIMPAR</button>
     </div>
 
-    <div class="brand-section">
-        <label style="color:#666">BUSCAR POR BANDEIRA / GPS</label>
-        <div class="grid-4">
-            <button class="btn-brand ipiranga" onclick="buscar('Posto Ipiranga')"><b>I</b> Ipiranga</button>
-            <button class="btn-brand shell" onclick="buscar('Posto Shell')"><b>S</b> Shell</button>
-            <button class="btn-brand petrobras" onclick="buscar('Posto Petrobras BR')"><b>BR</b> Petrobras</button>
-            <button class="btn-brand gps-waze" onclick="buscar('Posto de Gasolina', 'waze')"><b>🚙</b> Waze</button>
-            <button class="btn-brand gps-google" style="grid-column: span 2;" onclick="buscar('Posto de Gasolina', 'google')"><b>G</b> Google Maps</button>
-        </div>
-    </div>
-
     <div id="resultado">
         <span id="veredito" style="font-weight:bold; display:block; font-size: 1.2rem;"></span>
         <span id="detalhe" style="font-size:0.8rem"></span>
+    </div>
+
+    <div class="brand-section">
+        <label style="color:#666">ABRIR NO GPS</label>
+        <div class="grid-gps">
+            <button class="btn-brand-logo" onclick="buscar('Posto de Gasolina', 'google')" title="Google Maps">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" alt="Google Maps">
+            </button>
+            <button class="btn-brand-logo btn-waze" onclick="buscar('Posto de Gasolina', 'waze')" title="Waze">
+                <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/waze-icon.svg" alt="Waze">
+            </button>
+        </div>
+    </div>
+
+    <div class="brand-section">
+        <label style="color:#666">BUSCAR POR BANDEIRA</label>
+        <div class="grid-brands">
+            <button class="btn-brand-logo" onclick="buscar('Posto Ipiranga')" title="Ipiranga">
+                <img src="https://upload.wikimedia.org/wikipedia/de/thumb/8/8e/Petr%C3%B3leo_Ipiranga_Logo.svg/1280px-Petr%C3%B3leo_Ipiranga_Logo.svg.png" alt="Ipiranga">
+            </button>
+            <button class="btn-brand-logo" onclick="buscar('Posto Shell')" title="Shell">
+                <img src="https://cdn.worldvectorlogo.com/logos/shell-3.svg" alt="Shell">
+            </button>
+            <button class="btn-brand-logo" onclick="buscar('Posto Petrobras BR')" title="Petrobras">
+                <img src="https://logoeps.com/wp-content/uploads/2013/04/petrobras-br-vector-logo.png" alt="Petrobras">
+            </button>
+            <button class="btn-brand-logo" style="background: #444; color: white; font-weight: bold; font-size: 0.8rem;" onclick="buscar('Posto de Gasolina')" title="Outros">
+                OUTROS
+            </button>
+        </div>
     </div>
 
     <div class="historico-section">
@@ -120,6 +157,7 @@
 </div>
 
 <script>
+    // Carrega a regra salva ao abrir
     window.onload = function() {
         const salva = localStorage.getItem('regraComb');
         if (salva) document.getElementById('regra').value = salva;
@@ -185,7 +223,7 @@
             precos: `E:${e} | G:${g}`
         };
         hist.unshift(novo);
-        hist = hist.slice(0, 3); // Mantém os 3 últimos para não poluir
+        hist = hist.slice(0, 3);
         localStorage.setItem('histComb', JSON.stringify(hist));
         mostrarHistorico();
     }
