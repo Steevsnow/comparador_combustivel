@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etanol ou Gasolina?</title>
+    <style>
+        :root {
+            --primary: #27ae60;
+            --secondary: #2980b9;
+            --bg: #f4f7f6;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        h1 { color: var(--text); font-size: 1.5rem; margin-bottom: 1.5rem; }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #7f8c8d; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: var(--secondary); outline: none; }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--text);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.3s;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        #resultado {
+            margin-top: 1.5rem;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .etanol-win { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .gasolina-win { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>⛽ Qual compensa?</h1>
+    
+    <div class="input-group">
+        <label>Preço Etanol (R$)</label>
+        <input type="number" id="etanol" placeholder="0,00" step="0.01" inputmode="decimal">
+    </div>
+
+    <div class="input-group">
+        <label>Preço Gasolina (R$)</label>
+        <input type="number" id="gasolina" placeholder="0,00" step="0.01" inputmode="decimal">
+    </div>
+
+    <button onclick="calcular()">CALCULAR</button>
+
+    <div id="resultado">
+        <strong id="veredito"></strong><br>
+        <span id="porcentagem"></span>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        const precoEtanol = parseFloat(document.getElementById('etanol').value);
+        const precoGasolina = parseFloat(document.getElementById('gasolina').value);
+        const resDiv = document.getElementById('resultado');
+        const veredito = document.getElementById('veredito');
+        const porcentagem = document.getElementById('porcentagem');
+
+        if (precoEtanol > 0 && precoGasolina > 0) {
+            const relacao = precoEtanol / precoGasolina;
+            resDiv.style.display = 'block';
+
+            // Regra dos 70% (ajustável conforme o veículo)
+            if (relacao <= 0.70) {
+                resDiv.className = 'etanol-win';
+                veredito.innerText = "Vá de ETANOL! 🌿";
+            } else {
+                resDiv.className = 'gasolina-win';
+                veredito.innerText = "Vá de GASOLINA! ⛽";
+            }
+            porcentagem.innerText = `O etanol custa ${(relacao * 100).toFixed(1)}% da gasolina.`;
+        } else {
+            alert("Por favor, insira valores válidos.");
+        }
+    }
+</script>
+
+</body>
+</html>
