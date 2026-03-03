@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Combustível Pro v7.0 (Logos Originais)</title>
+    <title>Combustível Pro v10.0</title>
     <style>
         :root {
             --primary: #27ae60; --secondary: #2980b9; --bg: #121212;
@@ -20,7 +20,17 @@
         .app-card {
             background: var(--card); padding: 1.5rem; border-radius: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); width: 100%; max-width: 380px; text-align: center;
+            position: relative;
         }
+
+        /* Status da Conexão (Não clicável) */
+        #status-conexao {
+            font-size: 0.6rem; font-weight: bold; letter-spacing: 1px;
+            padding: 4px 12px; border-radius: 20px; margin-bottom: 15px;
+            display: inline-block; transition: all 0.3s;
+        }
+        .online { background: rgba(39, 174, 96, 0.2); color: var(--primary); }
+        .offline { background: rgba(231, 76, 60, 0.2); color: var(--danger); }
 
         h1 { font-size: 1.3rem; margin-bottom: 1.2rem; font-weight: 800; color: #ddd; }
         .input-container { margin-bottom: 1rem; text-align: left; }
@@ -32,52 +42,29 @@
             border-radius: 12px; font-size: 1.5rem; color: #fff; text-align: center; box-sizing: border-box; outline: none;
         }
 
-        select { font-size: 0.9rem; appearance: none; cursor: pointer; color: #aaa;}
+        select { font-size: 0.9rem; appearance: none; cursor: pointer; color: #aaa; }
 
-        /* Botões Principais */
         .button-group { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-top: 10px; }
         button { padding: 16px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
         .btn-calc { background: white; color: black; } .btn-clear { background: #333; color: var(--danger); }
         button:active { transform: scale(0.95); }
 
-        /* Estilo Botões de GPS e Bandeiras com Logos */
         .brand-section { margin-top: 25px; text-align: left; }
-        .grid-brands { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .grid-gps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .grid-brands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .grid-gps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         
         .btn-brand-logo { 
-            background: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 15px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 60px; /* Altura fixa para alinhar */
-            transition: all 0.2s;
+            background: #ffffff; border-radius: 12px; padding: 8px;
+            display: flex; align-items: center; justify-content: center;
+            height: 50px; border: none;
         }
+        .btn-brand-logo img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .btn-waze { background: #33ccff; }
 
-        .btn-brand-logo img {
-            max-width: 80%;
-            max-height: 80%;
-            object-fit: contain;
-        }
-
-        /* Hover leve nos logos */
-        .btn-brand-logo:hover {
-            box-shadow: 0 5px 15px rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
-
-        /* Cores específicas de fundo para GPS (opcional, para dar contraste) */
-        .btn-waze { background: #33ccff; border: none; } /* Azul Waze */
-
-        /* Resultado */
         #resultado { margin-top: 1.2rem; padding: 15px; border-radius: 15px; display: none; animation: slideUp 0.3s ease; }
         .melhor-etanol { background: #1b4332; border: 1px solid var(--primary); color: #b7e4c7; }
         .melhor-gasolina { background: #1a3a5a; border: 1px solid var(--secondary); color: #a2d2ff; }
 
-        /* Histórico */
         .historico-section { margin-top: 25px; text-align: left; border-top: 1px solid #333; padding-top: 15px; }
         .historico-item { 
             display: flex; justify-content: space-between; background: #252525; 
@@ -89,6 +76,8 @@
 <body>
 
 <div class="app-card">
+    <div id="status-conexao" class="online">● SISTEMA ONLINE</div>
+
     <h1>⛽ Gasolina ou Etanol?</h1>
     
     <div class="input-container">
@@ -102,11 +91,16 @@
     </div>
 
     <div class="input-container">
-        <label style="color:#888">ANO DO VEÍCULO (MEMÓRIA)</label>
+        <label style="color:#888">VALOR PARA ABASTECER (R$)</label>
+        <input type="text" id="valorAbast" placeholder="100,00" inputmode="numeric" oninput="mascaraMoeda(this)">
+    </div>
+
+    <div class="input-container">
+        <label style="color:#888">ANO DO VEÍCULO</label>
         <select id="regra" onchange="salvarConfig()">
-            <option value="0.70">Até 2012 (Regra 70%)</option>
-            <option value="0.72">2013-2020 (Regra 72%)</option>
-            <option value="0.75" selected>2021+ ou Turbo (Regra 75%)</option>
+            <option value="0.70">Até 2012 (70%)</option>
+            <option value="0.72">2013-2020 (72%)</option>
+            <option value="0.75" selected>2021+ ou Turbo (75%)</option>
         </select>
     </div>
 
@@ -116,36 +110,34 @@
     </div>
 
     <div id="resultado">
-        <span id="veredito" style="font-weight:bold; display:block; font-size: 1.2rem;"></span>
-        <span id="detalhe" style="font-size:0.8rem"></span>
+        <span id="veredito" style="font-weight:bold; display:block; font-size: 1.1rem;"></span>
+        <span id="detalhe" style="font-size:0.8rem; display:block; margin-bottom:8px;"></span>
+        <div id="litros-info" style="font-size:0.8rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:8px; line-height:1.4"></div>
     </div>
 
     <div class="brand-section">
         <label style="color:#666">ABRIR NO GPS</label>
         <div class="grid-gps">
-            <button class="btn-brand-logo" onclick="buscar('Posto de Gasolina', 'google')" title="Google Maps">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" alt="Google Maps">
+            <button class="btn-brand-logo" onclick="buscar('Posto', 'google')">
+                <img src="https://www.google.com/images/branding/product/2x/maps_96dp.png" alt="Google Maps">
             </button>
-            <button class="btn-brand-logo btn-waze" onclick="buscar('Posto de Gasolina', 'waze')" title="Waze">
-                <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/waze-icon.svg" alt="Waze">
+            <button class="btn-brand-logo btn-waze" onclick="buscar('Posto', 'waze')">
+                <img src="https://cdn.icon-icons.com/icons2/2108/PNG/512/waze_icon_130807.png" alt="Waze">
             </button>
         </div>
     </div>
 
     <div class="brand-section">
-        <label style="color:#666">BUSCAR POR BANDEIRA</label>
+        <label style="color:#666">BUSCAR BANDEIRA</label>
         <div class="grid-brands">
-            <button class="btn-brand-logo" onclick="buscar('Posto Ipiranga')" title="Ipiranga">
-                <img src="https://upload.wikimedia.org/wikipedia/de/thumb/8/8e/Petr%C3%B3leo_Ipiranga_Logo.svg/1280px-Petr%C3%B3leo_Ipiranga_Logo.svg.png" alt="Ipiranga">
+            <button class="btn-brand-logo" onclick="buscar('Posto Ipiranga')">
+                <img src="https://upload.wikimedia.org/wikipedia/pt/4/4b/Ipiranga_Logo.png" alt="Ipiranga">
             </button>
-            <button class="btn-brand-logo" onclick="buscar('Posto Shell')" title="Shell">
-                <img src="https://cdn.worldvectorlogo.com/logos/shell-3.svg" alt="Shell">
+            <button class="btn-brand-logo" onclick="buscar('Posto Shell')">
+                <img src="https://upload.wikimedia.org/wikipedia/pt/thumb/e/e8/Shell_logo.svg/1200px-Shell_logo.svg.png" alt="Shell">
             </button>
-            <button class="btn-brand-logo" onclick="buscar('Posto Petrobras BR')" title="Petrobras">
-                <img src="https://logoeps.com/wp-content/uploads/2013/04/petrobras-br-vector-logo.png" alt="Petrobras">
-            </button>
-            <button class="btn-brand-logo" style="background: #444; color: white; font-weight: bold; font-size: 0.8rem;" onclick="buscar('Posto de Gasolina')" title="Outros">
-                OUTROS
+            <button class="btn-brand-logo" onclick="buscar('Posto Petrobras BR')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Logo_Petrobras_BR.png" alt="BR">
             </button>
         </div>
     </div>
@@ -157,11 +149,26 @@
 </div>
 
 <script>
-    // Carrega a regra salva ao abrir
+    // Monitor de Conexão
+    window.addEventListener('online', atualizarStatus);
+    window.addEventListener('offline', atualizarStatus);
+
+    function atualizarStatus() {
+        const status = document.getElementById('status-conexao');
+        if (navigator.onLine) {
+            status.innerText = "● SISTEMA ONLINE";
+            status.className = "online";
+        } else {
+            status.innerText = "○ MODO OFFLINE";
+            status.className = "offline";
+        }
+    }
+
     window.onload = function() {
         const salva = localStorage.getItem('regraComb');
         if (salva) document.getElementById('regra').value = salva;
         mostrarHistorico();
+        atualizarStatus();
     };
 
     function salvarConfig() { localStorage.setItem('regraComb', document.getElementById('regra').value); }
@@ -176,14 +183,14 @@
     function limpar() {
         document.getElementById('etanol').value = "";
         document.getElementById('gasolina').value = "";
+        document.getElementById('valorAbast').value = "";
         document.getElementById('resultado').style.display = "none";
-        document.getElementById('etanol').focus();
     }
 
     function buscar(m, tipo) {
         const query = encodeURIComponent(m);
         if (tipo === 'waze') {
-            window.open(`waze://?q=${query}&navigate=yes`, '_blank');
+            window.location.href = `waze://?q=${query}&navigate=yes`;
         } else {
             window.open(`https://www.google.com/maps/search/${query}`, '_blank');
         }
@@ -192,46 +199,52 @@
     function calcular() {
         const eVal = document.getElementById('etanol').value.replace(",", ".");
         const gVal = document.getElementById('gasolina').value.replace(",", ".");
+        const vAbast = document.getElementById('valorAbast').value.replace(",", ".") || 0;
         const regra = parseFloat(document.getElementById('regra').value);
         
-        if (!eVal || eVal === "0.00" || !gVal || gVal === "0.00") return alert("Insira os preços!");
+        if (!eVal || !gVal || eVal === "0.00" || gVal === "0.00") return alert("Insira os preços!");
 
-        const rel = parseFloat(eVal) / parseFloat(gVal);
+        const pE = parseFloat(eVal);
+        const pG = parseFloat(gVal);
+        const pV = parseFloat(vAbast);
+        const rel = pE / pG;
         const resDiv = document.getElementById('resultado');
         resDiv.style.display = 'block';
 
-        let escolha = "";
-        if (rel <= regra) {
-            resDiv.className = 'melhor-etanol';
-            document.getElementById('veredito').innerText = "Vá de ETANOL! 🌿";
-            escolha = "Etanol";
-        } else {
-            resDiv.className = 'melhor-gasolina';
-            document.getElementById('veredito').innerText = "Vá de GASOLINA! ⛽";
-            escolha = "Gasolina";
-        }
+        let escolha = (rel <= regra) ? "Etanol" : "Gasolina";
+        resDiv.className = (escolha === "Etanol") ? 'melhor-etanol' : 'melhor-gasolina';
+        document.getElementById('veredito').innerText = "Vá de " + escolha.toUpperCase() + "!";
         document.getElementById('detalhe').innerText = `Relação: ${(rel * 100).toFixed(1)}% (Ref: ${(regra * 100).toFixed(0)}%)`;
         
+        // Info de Litros
+        if (pV > 0) {
+            const lE = (pV / pE).toFixed(2);
+            const lG = (pV / pG).toFixed(2);
+            const diff = Math.abs(lE - lG).toFixed(2);
+            document.getElementById('litros-info').innerHTML = 
+                `Com R$ ${pV.toFixed(2)} você coloca:<br><b>${lE}L</b> de Etanol ou <b>${lG}L</b> de Gasolina.<br>` +
+                `<small>Diferença de ${diff}L no tanque.</small>`;
+        } else {
+            document.getElementById('litros-info').innerHTML = "";
+        }
+
         salvarNoHistorico(escolha, eVal, gVal);
     }
 
     function salvarNoHistorico(escolha, e, g) {
         let hist = JSON.parse(localStorage.getItem('histComb') || "[]");
-        const novo = {
+        hist.unshift({
             data: new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}),
             escolha: escolha,
             precos: `E:${e} | G:${g}`
-        };
-        hist.unshift(novo);
-        hist = hist.slice(0, 3);
-        localStorage.setItem('histComb', JSON.stringify(hist));
+        });
+        localStorage.setItem('histComb', JSON.stringify(hist.slice(0, 3)));
         mostrarHistorico();
     }
 
     function mostrarHistorico() {
         const hist = JSON.parse(localStorage.getItem('histComb') || "[]");
-        const container = document.getElementById('lista-historico');
-        container.innerHTML = hist.map(item => `
+        document.getElementById('lista-historico').innerHTML = hist.map(item => `
             <div class="historico-item">
                 <span style="color:#888">${item.data}</span>
                 <span style="font-weight:bold">${item.escolha}</span>
