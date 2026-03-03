@@ -39,32 +39,39 @@
             text-align: center;
         }
 
-        h1 { font-size: 1.5rem; margin-bottom: 2rem; font-weight: 800; color: #ddd; }
+        h1 { font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 800; color: #ddd; }
 
-        .input-container { margin-bottom: 1.5rem; text-align: left; }
+        .input-container { margin-bottom: 1.2rem; text-align: left; }
 
-        label { display: block; margin-bottom: 8px; font-size: 0.8rem; letter-spacing: 1px; font-weight: bold; }
+        label { display: block; margin-bottom: 6px; font-size: 0.75rem; letter-spacing: 1px; font-weight: bold; }
         .label-etanol { color: var(--primary); }
         .label-gasolina { color: var(--secondary); }
+        .label-regra { color: #888; }
 
-        input {
+        input, select {
             width: 100%;
-            padding: 18px;
+            padding: 15px;
             background: #2c2c2c;
             border: 2px solid #3d3d3d;
-            border-radius: 15px;
-            font-size: 1.8rem;
+            border-radius: 12px;
+            font-size: 1.6rem;
             color: #fff;
             text-align: center;
             box-sizing: border-box;
             outline: none;
+            transition: all 0.3s;
         }
+
+        select { font-size: 1rem; cursor: pointer; appearance: none; }
+
+        #etanol:focus { border-color: var(--primary); }
+        #gasolina:focus { border-color: var(--secondary); }
 
         .button-group {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 2.5fr 1fr;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         button {
@@ -80,7 +87,6 @@
         .btn-calc { background: white; color: black; }
         .btn-clear { background: #333; color: var(--danger); border: 1px solid #444; }
 
-        /* Botões de Mapas */
         .maps-container {
             margin-top: 15px;
             display: grid;
@@ -88,20 +94,23 @@
             gap: 10px;
         }
 
-        .btn-google { background: #444; color: #fff; font-size: 0.8rem; border: 1px solid #555; }
-        .btn-waze { background: #444; color: var(--waze); font-size: 0.8rem; border: 1px solid #555; }
+        .btn-google { background: #222; color: #fff; font-size: 0.75rem; border: 1px solid #444; }
+        .btn-waze { background: #222; color: var(--waze); font-size: 0.75rem; border: 1px solid #444; }
 
         #resultado {
-            margin-top: 1.8rem;
-            padding: 20px;
+            margin-top: 1.5rem;
+            padding: 15px;
             border-radius: 15px;
             display: none;
+            animation: slideUp 0.3s ease-out;
         }
 
-        .melhor-etanol { background: #1b4332; border: 2px solid var(--primary); color: #b7e4c7; }
-        .melhor-gasolina { background: #1a3a5a; border: 2px solid var(--secondary); color: #a2d2ff; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .melhor-etanol { background: #1b4332; border: 1px solid var(--primary); color: #b7e4c7; }
+        .melhor-gasolina { background: #1a3a5a; border: 1px solid var(--secondary); color: #a2d2ff; }
         
-        .veredito-txt { font-size: 1.3rem; font-weight: bold; display: block; }
+        .veredito-txt { font-size: 1.2rem; font-weight: bold; display: block; }
     </style>
 </head>
 <body>
@@ -119,19 +128,28 @@
         <input type="text" id="gasolina" placeholder="0,00" inputmode="numeric" oninput="mascaraMoeda(this)">
     </div>
 
+    <div class="input-container">
+        <label class="label-regra">EFICIÊNCIA DO VEÍCULO</label>
+        <select id="regra">
+            <option value="0.70">70% (Motores Antigos)</option>
+            <option value="0.73" selected>73% (Motores Modernos)</option>
+            <option value="0.75">75% (Motores Turbo/Injeção Direta)</option>
+        </select>
+    </div>
+
     <div class="button-group">
         <button class="btn-calc" onclick="calcular()">CALCULAR</button>
         <button class="btn-clear" onclick="limpar()">LIMPAR</button>
     </div>
 
     <div class="maps-container">
-        <button class="btn-google" onclick="abrirMapa('google')">📍 Google Maps</button>
+        <button class="btn-google" onclick="abrirMapa('google')">📍 Maps</button>
         <button class="btn-waze" onclick="abrirMapa('waze')">🚙 Waze</button>
     </div>
 
     <div id="resultado">
         <span class="veredito-txt" id="veredito"></span>
-        <span id="detalhe" style="font-size: 0.85rem; opacity: 0.9;"></span>
+        <span id="detalhe" style="font-size: 0.8rem; opacity: 0.9;"></span>
     </div>
 </div>
 
@@ -162,6 +180,8 @@
     function calcular() {
         const eVal = document.getElementById('etanol').value.replace(",", ".");
         const gVal = document.getElementById('gasolina').value.replace(",", ".");
+        const regra = parseFloat(document.getElementById('regra').value);
+        
         const pE = parseFloat(eVal);
         const pG = parseFloat(gVal);
         const resDiv = document.getElementById('resultado');
@@ -169,14 +189,15 @@
         if (pE > 0 && pG > 0) {
             const rel = pE / pG;
             resDiv.style.display = 'block';
-            if (rel <= 0.70) {
+            
+            if (rel <= regra) {
                 resDiv.className = 'melhor-etanol';
                 document.getElementById('veredito').innerText = "Abasteça com ETANOL! 🌿";
             } else {
                 resDiv.className = 'melhor-gasolina';
                 document.getElementById('veredito').innerText = "Abasteça com GASOLINA! ⛽";
             }
-            document.getElementById('detalhe').innerText = `Relação: ${(rel * 100).toFixed(1)}%`;
+            document.getElementById('detalhe').innerText = `Relação: ${(rel * 100).toFixed(1)}% (Base: ${(regra * 100).toFixed(0)}%)`;
         } else {
             alert("Introduza os preços!");
         }
