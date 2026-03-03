@@ -2,142 +2,166 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etanol ou Gasolina?</title>
-    <link rel="manifest"
-        href="manifest.json">
-    <link rel="apple-touch-icon"
-        helf="icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Combustível Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icone.png">
     <meta name="theme-color" content="#27ae60">
     <style>
         :root {
             --primary: #27ae60;
             --secondary: #2980b9;
-            --bg: #f4f7f6;
-            --text: #2c3e50;
+            --bg: #121212; /* Modo escuro para cansar menos os olhos no sol */
+            --card: #1e1e1e;
+            --text: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
 
-        .card {
-            background: white;
+        .app-card {
+            background: var(--card);
             padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 350px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            width: 90%;
+            max-width: 400px;
             text-align: center;
         }
 
-        h1 { color: var(--text); font-size: 1.5rem; margin-bottom: 1.5rem; }
+        h1 { font-size: 1.8rem; margin-bottom: 2rem; font-weight: 800; }
 
-        .input-group {
-            margin-bottom: 1.2rem;
+        .input-container {
+            margin-bottom: 1.5rem;
             text-align: left;
         }
 
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #7f8c8d; }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
 
         input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            padding: 18px;
+            background: #2c2c2c;
+            border: 2px solid #3d3d3d;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            color: #fff;
+            text-align: center;
             box-sizing: border-box;
+            outline: none;
             transition: border-color 0.3s;
         }
 
-        input:focus { border-color: var(--secondary); outline: none; }
+        input:focus { border-color: var(--primary); }
 
         button {
             width: 100%;
-            padding: 15px;
-            background-color: var(--text);
+            padding: 20px;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 15px;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.1s, background 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
         }
-
-        button:active { transform: scale(0.98); }
 
         #resultado {
-            margin-top: 1.5rem;
-            padding: 15px;
-            border-radius: 10px;
+            margin-top: 2rem;
+            padding: 20px;
+            border-radius: 15px;
             display: none;
-            animation: fadeIn 0.5s;
+            animation: slideUp 0.4s ease-out;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .etanol-win { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .gasolina-win { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .melhor-etanol { background: #1b4332; border: 2px solid #2d6a4f; color: #74c69d; }
+        .melhor-gasolina { background: #1a3a5a; border: 2px solid #2980b9; color: #a2d2ff; }
+        
+        .veredito-txt { font-size: 1.4rem; font-weight: bold; display: block; }
+        .info-txt { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>⛽ Qual compensa?</h1>
+<div class="app-card">
+    <h1>⛽ Gas ou Etanol?</h1>
     
-    <div class="input-group">
-        <label>Preço Etanol (R$)</label>
-        <input type="number" id="etanol" placeholder="0,00" step="0.01" inputmode="decimal">
+    <div class="input-container">
+        <label>Preço Etanol</label>
+        <input type="text" id="etanol" placeholder="0,00" inputmode="numeric" oninput="mascaraMoeda(this)">
     </div>
 
-    <div class="input-group">
-        <label>Preço Gasolina (R$)</label>
-        <input type="number" id="gasolina" placeholder="0,00" step="0.01" inputmode="decimal">
+    <div class="input-container">
+        <label>Preço Gasolina</label>
+        <input type="text" id="gasolina" placeholder="0,00" inputmode="numeric" oninput="mascaraMoeda(this)">
     </div>
 
     <button onclick="calcular()">CALCULAR</button>
 
     <div id="resultado">
-        <strong id="veredito"></strong><br>
-        <span id="porcentagem"></span>
+        <span class="veredito-txt" id="veredito"></span>
+        <span class="info-txt" id="detalhe"></span>
     </div>
 </div>
 
 <script>
-    function calcular() {
-        const precoEtanol = parseFloat(document.getElementById('etanol').value);
-        const precoGasolina = parseFloat(document.getElementById('gasolina').value);
-        const resDiv = document.getElementById('resultado');
-        const veredito = document.getElementById('veredito');
-        const porcentagem = document.getElementById('porcentagem');
+    function mascaraMoeda(campo) {
+        let valor = campo.value.replace(/\D/g, "");
+        if (valor.length === 0) {
+            campo.value = "";
+            return;
+        }
+        valor = (parseFloat(valor) / 100).toFixed(2);
+        campo.value = valor.replace(".", ",");
+    }
 
-        if (precoEtanol > 0 && precoGasolina > 0) {
-            const relacao = precoEtanol / precoGasolina;
+    function calcular() {
+        const etanolVal = document.getElementById('etanol').value.replace(",", ".");
+        const gasolinaVal = document.getElementById('gasolina').value.replace(",", ".");
+        
+        const pEtanol = parseFloat(etanolVal);
+        const pGasolina = parseFloat(gasolinaVal);
+        const resDiv = document.getElementById('resultado');
+
+        if (pEtanol > 0 && pGasolina > 0) {
+            const relacao = pEtanol / pGasolina;
             resDiv.style.display = 'block';
 
-            // Regra dos 70% (ajustável conforme o veículo)
             if (relacao <= 0.70) {
-                resDiv.className = 'etanol-win';
-                veredito.innerText = "Vá de ETANOL! 🌿";
+                resDiv.className = 'melhor-etanol';
+                document.getElementById('veredito').innerText = "Vá de ETANOL! 🌿";
             } else {
-                resDiv.className = 'gasolina-win';
-                veredito.innerText = "Vá de GASOLINA! ⛽";
+                resDiv.className = 'melhor-gasolina';
+                document.getElementById('veredito').innerText = "Vá de GASOLINA! ⛽";
             }
-            porcentagem.innerText = `O etanol custa ${(relacao * 100).toFixed(1)}% da gasolina.`;
+            document.getElementById('detalhe').innerText = `Relação: ${(relacao * 100).toFixed(1)}%`;
         } else {
-            alert("Por favor, insira valores válidos.");
+            alert("Por favor, digite os preços.");
         }
     }
 </script>
 
 </body>
-
 </html>
-
