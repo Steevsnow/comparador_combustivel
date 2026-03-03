@@ -9,9 +9,9 @@
     <meta name="theme-color" content="#27ae60">
     <style>
         :root {
-            --primary: #27ae60;
-            --secondary: #2980b9;
-            --bg: #121212; /* Modo escuro para cansar menos os olhos no sol */
+            --primary: #27ae60;   /* Verde Etanol */
+            --secondary: #2980b9; /* Azul Gasolina */
+            --bg: #121212;
             --card: #1e1e1e;
             --text: #ffffff;
         }
@@ -25,7 +25,6 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
         }
 
         .app-card {
@@ -38,7 +37,8 @@
             text-align: center;
         }
 
-        h1 { font-size: 1.5rem; margin-bottom: 2rem; font-weight: 800; }
+        /* Ajuste do título para caber a palavra maior */
+        h1 { font-size: 1.5rem; margin-bottom: 2rem; font-weight: 800; color: #ddd; }
 
         .input-container {
             margin-bottom: 1.5rem;
@@ -48,10 +48,14 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #bbb;
             font-size: 0.9rem;
             margin-left: 5px;
+            font-weight: bold;
         }
+
+        /* Cores específicas para as etiquetas */
+        .label-etanol { color: var(--primary); }
+        .label-gasolina { color: var(--secondary); }
 
         input {
             width: 100%;
@@ -59,29 +63,33 @@
             background: #2c2c2c;
             border: 2px solid #3d3d3d;
             border-radius: 15px;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: #fff;
             text-align: center;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
-        input:focus { border-color: var(--primary); }
+        /* Bordas coloridas ao clicar no campo */
+        #etanol:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(39, 174, 96, 0.2); }
+        #gasolina:focus { border-color: var(--secondary); box-shadow: 0 0 10px rgba(41, 128, 185, 0.2); }
 
         button {
             width: 100%;
             padding: 20px;
-            background: var(--primary);
-            color: white;
+            background: #ffffff;
+            color: #000;
             border: none;
             border-radius: 15px;
             font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            transition: transform 0.1s;
         }
+
+        button:active { transform: scale(0.95); }
 
         #resultado {
             margin-top: 2rem;
@@ -96,8 +104,8 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .melhor-etanol { background: #1b4332; border: 2px solid #2d6a4f; color: #74c69d; }
-        .melhor-gasolina { background: #1a3a5a; border: 2px solid #2980b9; color: #a2d2ff; }
+        .melhor-etanol { background: #1b4332; border: 2px solid var(--primary); color: #74c69d; }
+        .melhor-gasolina { background: #1a3a5a; border: 2px solid var(--secondary); color: #a2d2ff; }
         
         .veredito-txt { font-size: 1.4rem; font-weight: bold; display: block; }
         .info-txt { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; display: block; }
@@ -109,16 +117,16 @@
     <h1>⛽ Gasolina ou Etanol?</h1>
     
     <div class="input-container">
-        <label>Preço Etanol</label>
+        <label class="label-etanol">PREÇO ETANOL</label>
         <input type="text" id="etanol" placeholder="0,00" inputmode="numeric" oninput="mascaraMoeda(this)">
     </div>
 
     <div class="input-container">
-        <label>Preço Gasolina</label>
+        <label class="label-gasolina">PREÇO GASOLINA</label>
         <input type="text" id="gasolina" placeholder="0,00" inputmode="numeric" oninput="mascaraMoeda(this)">
     </div>
 
-    <button onclick="calcular()">CALCULAR</button>
+    <button onclick="calcular()">CALCULAR AGORA</button>
 
     <div id="resultado">
         <span class="veredito-txt" id="veredito"></span>
@@ -156,14 +164,12 @@
                 resDiv.className = 'melhor-gasolina';
                 document.getElementById('veredito').innerText = "Abasteça com GASOLINA! ⛽";
             }
-            document.getElementById('detalhe').innerText = `Relação: ${(relacao * 100).toFixed(1)}%`;
+            document.getElementById('detalhe').innerText = `O etanol custa ${(relacao * 100).toFixed(1)}% da gasolina`;
         } else {
-            alert("Por favor, digite os preços.");
+            alert("Por favor, preencha os valores.");
         }
     }
 </script>
 
 </body>
 </html>
-
-
