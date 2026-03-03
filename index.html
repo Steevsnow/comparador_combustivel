@@ -9,11 +9,12 @@
     <meta name="theme-color" content="#27ae60">
     <style>
         :root {
-            --primary: #27ae60;   /* Verde Etanol */
-            --secondary: #2980b9; /* Azul Gasolina */
+            --primary: #27ae60;
+            --secondary: #2980b9;
             --bg: #121212;
             --card: #1e1e1e;
             --text: #ffffff;
+            --danger: #e74c3c;
         }
 
         body {
@@ -31,13 +32,12 @@
             background: var(--card);
             padding: 2rem;
             border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             width: 90%;
             max-width: 400px;
             text-align: center;
         }
 
-        /* Ajuste do título para caber a palavra maior */
         h1 { font-size: 1.5rem; margin-bottom: 2rem; font-weight: 800; color: #ddd; }
 
         .input-container {
@@ -48,12 +48,11 @@
         label {
             display: block;
             margin-bottom: 8px;
-            font-size: 0.9rem;
-            margin-left: 5px;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
             font-weight: bold;
         }
 
-        /* Cores específicas para as etiquetas */
         .label-etanol { color: var(--primary); }
         .label-gasolina { color: var(--secondary); }
 
@@ -71,28 +70,34 @@
             transition: all 0.3s;
         }
 
-        /* Bordas coloridas ao clicar no campo */
-        #etanol:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(39, 174, 96, 0.2); }
-        #gasolina:focus { border-color: var(--secondary); box-shadow: 0 0 10px rgba(41, 128, 185, 0.2); }
+        #etanol:focus { border-color: var(--primary); }
+        #gasolina:focus { border-color: var(--secondary); }
+
+        /* Grade de botões */
+        .button-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Calcular maior que o Limpar */
+            gap: 10px;
+            margin-top: 10px;
+        }
 
         button {
-            width: 100%;
-            padding: 20px;
-            background: #ffffff;
-            color: #000;
+            padding: 18px;
             border: none;
             border-radius: 15px;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
             transition: transform 0.1s;
         }
+
+        .btn-calc { background: white; color: black; }
+        .btn-clear { background: #333; color: var(--danger); border: 1px solid #444; }
 
         button:active { transform: scale(0.95); }
 
         #resultado {
-            margin-top: 2rem;
+            margin-top: 1.8rem;
             padding: 20px;
             border-radius: 15px;
             display: none;
@@ -100,15 +105,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .melhor-etanol { background: #1b4332; border: 2px solid var(--primary); color: #74c69d; }
+        .melhor-etanol { background: #1b4332; border: 2px solid var(--primary); color: #b7e4c7; }
         .melhor-gasolina { background: #1a3a5a; border: 2px solid var(--secondary); color: #a2d2ff; }
         
-        .veredito-txt { font-size: 1.4rem; font-weight: bold; display: block; }
-        .info-txt { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; display: block; }
+        .veredito-txt { font-size: 1.3rem; font-weight: bold; display: block; }
+        .info-txt { font-size: 0.85rem; opacity: 0.9; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -126,7 +131,10 @@
         <input type="text" id="gasolina" placeholder="0,00" inputmode="numeric" oninput="mascaraMoeda(this)">
     </div>
 
-    <button onclick="calcular()">CALCULAR AGORA</button>
+    <div class="button-group">
+        <button class="btn-calc" onclick="calcular()">CALCULAR</button>
+        <button class="btn-clear" onclick="limpar()">LIMPAR</button>
+    </div>
 
     <div id="resultado">
         <span class="veredito-txt" id="veredito"></span>
@@ -145,6 +153,13 @@
         campo.value = valor.replace(".", ",");
     }
 
+    function limpar() {
+        document.getElementById('etanol').value = "";
+        document.getElementById('gasolina').value = "";
+        document.getElementById('resultado').style.display = "none";
+        document.getElementById('etanol').focus();
+    }
+
     function calcular() {
         const etanolVal = document.getElementById('etanol').value.replace(",", ".");
         const gasolinaVal = document.getElementById('gasolina').value.replace(",", ".");
@@ -159,10 +174,10 @@
 
             if (relacao <= 0.70) {
                 resDiv.className = 'melhor-etanol';
-                document.getElementById('veredito').innerText = "Abasteça com ETANOL! 🌿";
+                document.getElementById('veredito').innerText = "Vá de ETANOL! 🌿";
             } else {
                 resDiv.className = 'melhor-gasolina';
-                document.getElementById('veredito').innerText = "Abasteça com GASOLINA! ⛽";
+                document.getElementById('veredito').innerText = "Vá de GASOLINA! ⛽";
             }
             document.getElementById('detalhe').innerText = `O etanol custa ${(relacao * 100).toFixed(1)}% da gasolina`;
         } else {
@@ -173,3 +188,4 @@
 
 </body>
 </html>
+
