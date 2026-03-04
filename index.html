@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Combustível Pro v24.0</title>
+    <title>Combustível Pro v25.0</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -25,7 +25,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.6); width: 100%; max-width: 380px; text-align: center;
         }
 
-        /* Alerta de GPS */
         #gps-alert {
             display: none; background: rgba(231, 76, 60, 0.2); color: #ff7675;
             font-size: 0.7rem; padding: 10px; border-radius: 12px; margin-bottom: 15px;
@@ -88,7 +87,7 @@
 <body>
 
 <div class="app-card">
-    <div id="gps-alert">📍 GPS desativado ou sem permissão. A busca pode não ser precisa.</div>
+    <div id="gps-alert">📍 Permita a localização para achar postos próximos.</div>
     <div id="status-conexao" class="online">● SISTEMA ONLINE</div>
     
     <h1>⛽ Gasolina ou Etanol?</h1>
@@ -133,8 +132,8 @@
     <div class="brand-section">
         <div class="section-label">Procura no GPS</div>
         <div class="grid-icons">
-            <button class="btn-icon-base gps-size" onclick="verificarGps('Posto de Combustível', 'google')"><img src="maps.png" alt="Maps"></button>
-            <button class="btn-icon-base gps-size" onclick="verificarGps('Posto de Combustível', 'waze')"><img src="waze.png" alt="Waze"></button>
+            <button class="btn-icon-base gps-size" onclick="verificarGps('Posto de Gasolina', 'google')"><img src="maps.png" alt="Maps"></button>
+            <button class="btn-icon-base gps-size" onclick="verificarGps('Posto de Gasolina', 'waze')"><img src="waze.png" alt="Waze"></button>
         </div>
     </div>
 
@@ -160,14 +159,13 @@
         navigator.serviceWorker.register('sw.js').then(() => console.log("SW OK"));
     }
 
-    // VERIFICAÇÃO DE GPS E BUSCA REFINADA
     function verificarGps(destino, tipo) {
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 () => { buscar(destino, tipo); },
                 () => {
                     document.getElementById('gps-alert').style.display = 'block';
-                    setTimeout(() => { buscar(destino, tipo); }, 1200);
+                    setTimeout(() => { buscar(destino, tipo); }, 800);
                 }
             );
         } else {
@@ -176,22 +174,22 @@
     }
 
     function buscar(m, t) {
-        // Refinamento: Se o destino não incluir a palavra "Posto", adicionamos para garantir
+        // AJUSTE CRÍTICO: "Posto de Gasolina" é o termo que o Google NÃO confunde com saúde.
         let termoFinal = m;
-        if (!m.includes("Combustível")) {
-            termoFinal = m + " Combustível";
+        if (!m.includes("Gasolina")) {
+            termoFinal = m + " Gasolina";
         }
         
         const q = encodeURIComponent(termoFinal);
         if (t === 'waze') {
             window.location.href = `waze://?q=${q}&navigate=yes`;
         } else {
-            // URL Google Maps refinada para busca de estabelecimentos
+            // URL que força a visualização de estabelecimentos comerciais
             window.open(`https://www.google.com/maps/search/${q}`, '_blank');
         }
     }
 
-    // LÓGICA DE INTERFACE
+    // INTERFACE E CÁLCULO
     function atualizarStatus() {
         const s = document.getElementById('status-conexao');
         s.innerText = navigator.onLine ? "● SISTEMA ONLINE" : "○ MODO OFFLINE";
