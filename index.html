@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Combustível Pro</title>
+    <title>Combustível Pro v22.0</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -48,7 +48,6 @@
         .btn-clear { background: #333; color: var(--danger); }
         button:active { transform: scale(0.96); }
 
-        /* Estilização das LABELS de separação */
         .brand-section { margin-top: 30px; }
         .section-label { 
             display: flex; align-items: center; justify-content: center;
@@ -61,21 +60,24 @@
         
         .grid-icons { 
             display: flex; justify-content: space-around; align-items: center; 
-            gap: 8px; /* Reduzi ligeiramente o espaço para acomodar o 4º ícone */     
-            padding: 5px 0;
-            flex-wrap: wrap; /* Caso o ecrã seja muito pequeno, ele move para a linha de baixo automaticamente */
+            gap: 10px; flex-wrap: wrap; padding: 5px 0;
         }
         
-        .btn-icon-large { 
+        /* Botões Base */
+        .btn-icon-base { 
             background: transparent; border: none; padding: 0;
             display: flex; align-items: center; justify-content: center;
-            width: 75px; /* Ajustei de 85px para 75px para garantir que os 4 caibam lado a lado em quase todos os telemóveis */ 
-            height: 75px; cursor: pointer;
+            cursor: pointer; transition: transform 0.1s;
         }
-        .btn-icon-large img { 
+        .btn-icon-base:active { transform: scale(0.9); }
+        .btn-icon-base img { 
             width: 100%; height: 100%; object-fit: contain; 
             filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));
         }
+
+        /* Tamanhos Específicos */
+        .gps-size { width: 100px; height: 100px; }
+        .posto-size { width: 75px; height: 75px; }
 
         #resultado { margin-top: 1.2rem; padding: 15px; border-radius: 18px; display: none; animation: slideUp 0.4s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -134,18 +136,18 @@
     <div class="brand-section">
         <div class="section-label">Procura no GPS</div>
         <div class="grid-icons">
-            <button class="btn-icon-large" onclick="buscar('Posto', 'google')"><img src="maps.png" alt="Maps"></button>
-            <button class="btn-icon-large" onclick="buscar('Posto', 'waze')"><img src="waze.png" alt="Waze"></button>
+            <button class="btn-icon-base gps-size" onclick="buscar('Posto', 'google')"><img src="maps.png" alt="Maps"></button>
+            <button class="btn-icon-base gps-size" onclick="buscar('Posto', 'waze')"><img src="waze.png" alt="Waze"></button>
         </div>
     </div>
 
     <div class="brand-section">
         <div class="section-label">Postos por Bandeira</div>
         <div class="grid-icons">
-            <button class="btn-icon-large" onclick="buscar('Posto Ipiranga')"><img src="ipiranga.png" alt="Ipiranga"></button>
-            <button class="btn-icon-large" onclick="buscar('Posto Shell')"><img src="shell.png" alt="Shell"></button>
-            <button class="btn-icon-large" onclick="buscar('Posto Petrobras BR')"><img src="br.png" alt="BR"></button>
-            <button class="btn-icon-large" onclick="buscar('Rede Ceará')"><img src="ceara.png" alt="Ceará"></button>
+            <button class="btn-icon-base posto-size" onclick="buscar('Posto Ipiranga')"><img src="ipiranga.png" alt="Ipiranga"></button>
+            <button class="btn-icon-base posto-size" onclick="buscar('Posto Shell')"><img src="shell.png" alt="Shell"></button>
+            <button class="btn-icon-base posto-size" onclick="buscar('Posto Petrobras BR')"><img src="br.png" alt="BR"></button>
+            <button class="btn-icon-base posto-size" onclick="buscar('Rede Ceará')"><img src="ceara.png" alt="Ceará"></button>
         </div>
     </div>
 
@@ -157,7 +159,10 @@
 </div>
 
 <script>
-    // Funções de Status e Configuração
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(() => console.log("SW OK"));
+    }
+
     function atualizarStatus() {
         const s = document.getElementById('status-conexao');
         s.innerText = navigator.onLine ? "● SISTEMA ONLINE" : "○ MODO OFFLINE";
@@ -184,7 +189,6 @@
         if (t === 'waze') {
             window.location.href = `waze://?q=${q}&navigate=yes`;
         } else {
-            // URL corrigida para o Google Maps
             window.open(`https://www.google.com/maps/search/${q}`, '_blank');
         }
     }
@@ -195,6 +199,8 @@
         const v = parseFloat(document.getElementById('valorAbast').value.replace(",", ".")) || 0;
         const r = parseFloat(document.getElementById('regra').value);
         
+        if (!e || !g) return;
+
         const rel = e / g;
         const resDiv = document.getElementById('resultado');
         resDiv.style.display = 'block';
@@ -206,6 +212,8 @@
         
         if (v > 0) {
             document.getElementById('litros-info').innerHTML = `R$ ${v.toFixed(2)} rende:<br><b>${(v/e).toFixed(2)}L</b> de Etanol ou <b>${(v/g).toFixed(2)}L</b> de Gasolina`;
+        } else {
+            document.getElementById('litros-info').innerHTML = "";
         }
         salvarNoHistorico(escolha, e, g);
     }
@@ -239,13 +247,6 @@
         }
     }
     function salvarConfig() { localStorage.setItem('regraComb', document.getElementById('regra').value); }
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log("Service Worker Registrado!"));
-  }
 </script>
 </body>
 </html>
-
-
