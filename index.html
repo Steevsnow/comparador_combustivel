@@ -97,7 +97,7 @@
             <input type="text" id="gasolina" placeholder="0,00" inputmode="decimal" required oninput="mascaraMoeda(this)">
         </div>
         <div class="input-container">
-            <label style="color:#888">VALOR DISPONÍVEL (R$)</label>
+            <label style="color:#888">VALOR DO ABASTECIMENTO (R$)</label>
             <input type="text" id="valorAbast" placeholder="0,00" inputmode="decimal" oninput="mascaraMoeda(this)">
         </div>
         <div class="input-container">
@@ -140,7 +140,6 @@
 </div>
 
 <script>
-    // Registro do Service Worker com AUTO-REFRESH para atualizações
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').then(reg => {
@@ -148,7 +147,6 @@
                     const installingWorker = reg.installing;
                     installingWorker.onstatechange = () => {
                         if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('Nova versão detectada! Atualizando...');
                             window.location.reload();
                         }
                     };
