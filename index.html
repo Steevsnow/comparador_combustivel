@@ -140,6 +140,7 @@
 </div>
 
 <script>
+    // Registro do SW com Auto-Update
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').then(reg => {
@@ -198,20 +199,32 @@
     }
 
     function calcular() {
+        // --- MELHORIA: FEEDBACK TÁTIL ---
+        if (navigator.vibrate) navigator.vibrate(15); 
+
         const e = parseFloat(document.getElementById('etanol').value.replace(",", "."));
         const g = parseFloat(document.getElementById('gasolina').value.replace(",", "."));
         const v = parseFloat(document.getElementById('valorAbast').value.replace(",", ".")) || 0;
         const r = parseFloat(document.getElementById('regra').value);
+        
         if (!e || !g) return;
+        
         const rel = e / g;
         const resDiv = document.getElementById('resultado');
         resDiv.style.display = 'block';
+        
         const escolha = rel <= r ? "Etanol" : "Gasolina";
         resDiv.className = escolha === "Etanol" ? 'melhor-etanol' : 'melhor-gasolina';
+        
         document.getElementById('veredito').innerText = `Abastecer com ${escolha}`;
         document.getElementById('detalhe').innerText = `Relação: ${(rel * 100).toFixed(1)}%`;
-        if (v > 0) document.getElementById('litros-info').innerHTML = `R$ ${v.toFixed(2)} rende:<br><b>${(v/e).toFixed(2)}L</b> de Etanol ou <b>${(v/g).toFixed(2)}L</b> de Gasolina`;
-        else document.getElementById('litros-info').innerHTML = "";
+        
+        if (v > 0) {
+            document.getElementById('litros-info').innerHTML = `R$ ${v.toFixed(2)} rende:<br><b>${(v/e).toFixed(2)}L</b> de Etanol ou <b>${(v/g).toFixed(2)}L</b> de Gasolina`;
+        } else {
+            document.getElementById('litros-info').innerHTML = "";
+        }
+        
         salvarNoHistorico(escolha, e, g);
     }
 
